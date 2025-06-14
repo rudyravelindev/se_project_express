@@ -19,3 +19,11 @@ app.use("/", mainRouter);
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
+
+// Temporary auth middleware (replace with real auth later)
+app.use((req, res, next) => {
+  req.user = {
+    _id: "YOUR_TEST_USER_ID",
+  };
+  next();
+});
