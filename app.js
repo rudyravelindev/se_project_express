@@ -11,19 +11,21 @@ mongoose
   .then(() => {
     console.log("Connected to DB");
   })
-  .catch(console.error);
+  .catch((err) => {
+    console.error("Database connection error:", err);
+  });
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: "684d07977447bf177cf0a902",
+  };
+  next();
+});
+
 app.use("/", mainRouter);
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
-
-// Temporary auth middleware (replace with real auth later)
-app.use((req, res, next) => {
-  req.user = {
-    _id: "YOUR_TEST_USER_ID",
-  };
-  next();
+  console.log(`Server running on port ${PORT}`);
 });
