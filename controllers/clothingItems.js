@@ -7,6 +7,27 @@ const {
   FORBIDDEN,
 } = require("../utils/errors");
 
+// Centralized error handler
+const handleError = (err, res) => {
+  console.error(err);
+
+  if (err.name === "CastError") {
+    return res.status(BAD_REQUEST).send({ message: "Invalid ID format" });
+  }
+
+  if (err.name === "ValidationError") {
+    return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+  }
+
+  if (err.statusCode && err.statusCode !== SERVER_ERROR) {
+    return res.status(err.statusCode).send({ message: err.message });
+  }
+
+  return res
+    .status(SERVER_ERROR)
+    .send({ message: "An error has occurred on the server." });
+};
+
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
@@ -17,22 +38,13 @@ const createItem = (req, res) => {
     owner: req.user._id,
   })
     .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
-      }
-      return res.status(SERVER_ERROR).send({ message: "Server error" });
-    });
+    .catch((err) => handleError(err, res));
 };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send({ data: items }))
-    .catch((err) => {
-      console.error(err);
-      res.status(SERVER_ERROR).send({ message: "Server error" });
-    });
+    .catch((err) => handleError(err, res));
 };
 
 const deleteItem = (req, res) => {
@@ -53,14 +65,9 @@ const deleteItem = (req, res) => {
       return item.deleteOne();
     })
     .then(() => res.send({ message: "Item deleted" }))
-    .catch((err) => {
-      console.error(err);
-      const status = err.statusCode || SERVER_ERROR;
-      res.status(status).send({ message: err.message || "Server error" });
-    });
+    .catch((err) => handleError(err, res));
 };
 
-// Like/Dislike functionality
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -73,11 +80,7 @@ const likeItem = (req, res) => {
       throw error;
     })
     .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      const status = err.statusCode || SERVER_ERROR;
-      res.status(status).send({ message: err.message || "Server error" });
-    });
+    .catch((err) => handleError(err, res));
 };
 
 const dislikeItem = (req, res) => {
@@ -92,11 +95,7 @@ const dislikeItem = (req, res) => {
       throw error;
     })
     .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      const status = err.statusCode || SERVER_ERROR;
-      res.status(status).send({ message: err.message || "Server error" });
-    });
+    .catch((err) => handleError(err, res));
 };
 
 module.exports = {
