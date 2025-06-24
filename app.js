@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const mainRouter = require("./routes/index");
 
 const app = express();
@@ -14,15 +15,9 @@ mongoose
   .catch((err) => {
     console.error("Database connection error:", err);
   });
+app.use(cors());
 
 app.use(express.json());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: "684d07977447bf177cf0a902",
-  };
-  next();
-});
 
 app.use("/", mainRouter);
 

@@ -1,3 +1,7 @@
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
+
 const User = require("../models/user");
 const {
   BAD_REQUEST,
@@ -25,10 +29,8 @@ const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   try {
-    // Create user - password hashing happens automatically via the pre('save') hook
     const user = await User.create({ name, avatar, email, password });
 
-    // Remove password from response
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -79,4 +81,69 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser };
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findUserByCredentials(email, password);
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.send({ token, user: userResponse });
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(401).send({
+      message: "Authentication failed",
+      error: err.message,
+    });
+  }
+};
+
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(NOT_FOUND).send({ message: "User not found" });
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(500).send({ message: "Server error" });
+  }
+};
+const updateProfile = async (req, res) => {
+  const { name, avatar } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, avatar },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send(updatedUser);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      res.status(400).send({ message: "Invalid data", error: err.message });
+    } else {
+      res.status(500).send({ message: "Server error" });
+    }
+  }
+};
+module.exports = {
+  getUsers,
+  createUser,
+  getUser,
+  login,
+  getCurrentUser,
+  updateProfile,
+};
