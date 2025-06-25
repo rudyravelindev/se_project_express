@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { login, createUser } = require("../controllers/users");
+const { getItems } = require("../controllers/clothingItems");
 const auth = require("../middlewares/auth");
 
 const userRouter = require("./users");
@@ -9,10 +10,12 @@ const { NOT_FOUND } = require("../utils/errors");
 // Public routes
 router.post("/signin", login);
 router.post("/signup", createUser);
-router.get("/items", clothingItemsRouter);
+router.get("/items", getItems);
 
 // Auth middleware
 router.use(auth);
+router.use("/users", userRouter);
+router.use("/items", clothingItemsRouter);
 
 // 404 handler
 router.use((req, res) => {
