@@ -4,7 +4,6 @@ const router = express.Router();
 
 const {
   createItem,
-  getItems,
   deleteItem,
   likeItem,
   dislikeItem,

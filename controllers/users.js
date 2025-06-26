@@ -9,7 +9,6 @@ const {
   CONFLICT,
   UNAUTHORIZED,
 } = require("../utils/errors");
-const bcrypt = require("bcryptjs");
 
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -19,7 +18,7 @@ const createUser = async (req, res) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    res.status(201).send(userResponse);
+    return res.status(201).send(userResponse);
   } catch (err) {
     console.error("Error creating user:", err);
 
@@ -35,7 +34,7 @@ const createUser = async (req, res) => {
       });
     }
 
-    res.status(SERVER_ERROR).send({
+    return res.status(SERVER_ERROR).send({
       message: "Internal server error",
     });
   }
@@ -57,7 +56,7 @@ const login = async (req, res) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    res.send({ token, user: userResponse });
+    return res.send({ token, user: userResponse });
   } catch (err) {
     console.error("Login error:", err.message);
 
@@ -67,7 +66,7 @@ const login = async (req, res) => {
       });
     }
 
-    res.status(SERVER_ERROR).send({
+    return res.status(SERVER_ERROR).send({
       message: "Internal server error",
     });
   }
@@ -79,9 +78,9 @@ const getCurrentUser = async (req, res) => {
     if (!user) {
       return res.status(NOT_FOUND).send({ message: "User not found" });
     }
-    res.send(user);
+    return res.send(user);
   } catch (err) {
-    res.status(SERVER_ERROR).send({ message: "Server error" });
+    return res.status(SERVER_ERROR).send({ message: "Server error" });
   }
 };
 
@@ -102,13 +101,12 @@ const updateProfile = async (req, res) => {
       return res.status(NOT_FOUND).send({ message: "User not found" });
     }
 
-    res.send(updatedUser);
+    return res.send(updatedUser);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(BAD_REQUEST).send({ message: "Invalid data" });
-    } else {
-      res.status(SERVER_ERROR).send({ message: "Server error" });
+      return res.status(BAD_REQUEST).send({ message: "Invalid data" });
     }
+    return res.status(SERVER_ERROR).send({ message: "Server error" });
   }
 };
 
