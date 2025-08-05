@@ -28,6 +28,17 @@ const handleError = (err, res) => {
     .send({ message: "An error has occurred on the server." });
 };
 
+const getItemById = (req, res) => {
+  ClothingItem.findById(req.params.id)
+    .orFail(() => {
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
+    })
+    .then((item) => res.send({ data: item }))
+    .catch((err) => handleError(err, res));
+};
+
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
@@ -101,6 +112,7 @@ const dislikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
+  getItemById, // Add this
   deleteItem,
   likeItem,
   dislikeItem,

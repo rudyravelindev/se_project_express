@@ -1,21 +1,38 @@
 const router = require("express").Router();
 const { login, createUser } = require("../controllers/users");
-const { getItems } = require("../controllers/clothingItems");
+const {
+  getItems,
+  createItem,
+  getItemById,
+  deleteItem,
+  likeItem,
+  dislikeItem,
+} = require("../controllers/clothingItems"); // Added missing exports
 const auth = require("../middlewares/auth");
-
-const userRouter = require("./users");
-const clothingItemsRouter = require("./clothingItems");
+const {
+  validateCardBody,
+  validateUserBody,
+  validateLogin,
+  validateId,
+} = require("../middlewares/validation");
 const { NOT_FOUND } = require("../utils/errors");
 
 // Public routes
-router.post("/signin", login);
-router.post("/signup", createUser);
+router.post("/signin", validateLogin, login);
+router.post("/signup", validateUserBody, createUser);
 router.get("/items", getItems);
 
-// Auth middleware
+// Protected routes (require authentication)
 router.use(auth);
-router.use("/users", userRouter);
-router.use("/items", clothingItemsRouter);
+router.post("/items", validateCardBody, createItem);
+router.get("/items/:id", validateId, getItemById);
+router.delete("/items/:id", validateId, deleteItem); // Added missing route
+router.put("/items/:id/likes", validateId, likeItem); // Added missing route
+router.delete("/items/:id/likes", validateId, dislikeItem); // Added missing route
+
+// Mount sub-routers
+router.use("/users", require("./users"));
+router.use("/items", require("./clothingItems"));
 
 // 404 handler
 router.use((req, res) => {

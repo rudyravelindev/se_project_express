@@ -1,26 +1,53 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const mainRouter = require("./routes/index");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const { errors } = require("celebrate");
+const router = require("./routes");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+const errorHandler = require("./middlewares/errorHandler");
+
+const { PORT = 3001, MONGO_URL = "mongodb://127.0.0.1:27017/wtwr_db" } =
+  process.env;
 
 const app = express();
 
-const { PORT = 3001 } = process.env;
-
-mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("Connected to DB");
-  })
-  .catch((err) => {
-    console.error("Database connection error:", err);
-  });
+// Security middleware
+app.use(helmet());
 app.use(cors());
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// Body parser
 app.use(express.json());
 
-app.use("/", mainRouter);
+// Request logging
+app.use(requestLogger);
 
+// Routes
+app.use(router);
+
+// Error logging
+app.use(errorLogger);
+
+// Error handlers
+app.use(errors()); // Celebrate error handler
+app.use(errorHandler); // Centralized error handler
+
+// Database connection
+mongoose
+  .connect(MONGO_URL)
+  .then(() => console.log("Connected to DB"))
+  .catch((err) => console.error("Database connection error:", err));
+
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
