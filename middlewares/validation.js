@@ -72,6 +72,20 @@ const validateId = celebrate({
   }),
 });
 
+const validateUpdateProfile = celebrate({
+  body: Joi.object()
+    .keys({
+      name: Joi.string().min(2).max(30).messages({
+        "string.min": "Name must be at least 2 characters long",
+        "string.max": "Name cannot exceed 30 characters",
+      }),
+      avatar: Joi.string().custom(validateURL).messages({
+        "string.uri": "Avatar must be a valid URL",
+      }),
+    })
+    .or("name", "avatar"),
+});
+
 module.exports = {
   validateCardBody,
   validateUserBody,

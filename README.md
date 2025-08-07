@@ -1,5 +1,14 @@
 # WTWR (What to Wear?): Back End
 
+### Backend API
+
+**Base URL:** `https://api.rudyravelinwtwr.crabdance.com`
+
+### Frontend Application
+
+**URL:** [https://rudyravelinwtwr.crabdance.com](https://rudyravelinwtwr.crabdance.com)  
+**Features:**
+
 ## Project Description
 
 WTWR is a weather-dependent clothing recommendation application that helps users decide what to wear based on current weather conditions. The back end serves as the API and data layer for the WTWR application, handling user authentication, clothing item management, and weather data integration.
