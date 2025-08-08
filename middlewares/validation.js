@@ -1,7 +1,6 @@
 const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
 
-// Custom URL validator using validator.isURL
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
@@ -28,7 +27,6 @@ const validateCardBody = celebrate({
   }),
 });
 
-// 2. Validate user registration
 const validateUserBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).messages({
@@ -49,7 +47,6 @@ const validateUserBody = celebrate({
   }),
 });
 
-// 3. Validate login
 const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
@@ -62,7 +59,6 @@ const validateLogin = celebrate({
   }),
 });
 
-// 4. Validate user or card ID params
 const validateId = celebrate({
   params: Joi.object().keys({
     id: Joi.string().length(24).hex().required().messages({
@@ -91,4 +87,5 @@ module.exports = {
   validateUserBody,
   validateLogin,
   validateId,
+  validateUpdateProfile,
 };

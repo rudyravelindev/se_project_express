@@ -1,90 +1,82 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  BadRequestError,
-  NotFoundError,
-  ForbiddenError,
-} = require("../utils/errors");
-
-const getItemById = (req, res, next) => {
-  ClothingItem.findById(req.params.id)
-    .orFail(() => {
-      throw new NotFoundError("Item not found");
-    })
-    .then((item) => res.send({ data: item }))
-    .catch(next);
-};
+const { NotFoundError, ForbiddenError } = require("../utils/errors");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
+  const owner = req.user._id;
 
-  ClothingItem.create({
-    name,
-    weather,
-    imageUrl,
-    owner: req.user._id,
-  })
-    .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid item data"));
-      } else {
-        next(err);
-      }
-    });
+  ClothingItem.create({ name, weather, imageUrl, owner })
+    .then((item) => res.status(201).send(item))
+    .catch(next);
 };
 
-const getItems = (req, res, next) => {
-  ClothingItem.find({})
-    .then((items) => res.send({ data: items }))
+const getItemById = (req, res, next) => {
+  const { id } = req.params;
+
+  ClothingItem.findById(id)
+    .then((item) => {
+      if (!item) {
+        throw new NotFoundError("Item not found");
+      }
+      res.send(item);
+    })
     .catch(next);
 };
 
 const deleteItem = (req, res, next) => {
-  const { itemId } = req.params;
+  const { id } = req.params;
+  const userId = req.user._id;
 
-  ClothingItem.findById(itemId)
-    .orFail(() => {
-      throw new NotFoundError("Item not found");
-    })
+  ClothingItem.findById(id)
     .then((item) => {
-      if (item.owner.toString() !== req.user._id) {
+      if (!item) {
+        throw new NotFoundError("Item not found");
+      }
+      if (item.owner.toString() !== userId) {
         throw new ForbiddenError("Not authorized to delete this item");
       }
-      return item.deleteOne();
+      return ClothingItem.findByIdAndDelete(id);
     })
     .then(() => res.send({ message: "Item deleted" }))
     .catch(next);
 };
 
 const likeItem = (req, res, next) => {
+  const { id } = req.params;
+
   ClothingItem.findByIdAndUpdate(
-    req.params.itemId,
+    id,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      throw new NotFoundError("Item not found");
+    .then((item) => {
+      if (!item) {
+        throw new NotFoundError("Item not found");
+      }
+      res.send(item);
     })
-    .then((item) => res.send({ data: item }))
     .catch(next);
 };
 
 const dislikeItem = (req, res, next) => {
+  const { id } = req.params;
+
   ClothingItem.findByIdAndUpdate(
-    req.params.itemId,
+    id,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      throw new NotFoundError("Item not found");
+    .then((item) => {
+      if (!item) {
+        throw new NotFoundError("Item not found");
+      }
+      res.send(item);
     })
-    .then((item) => res.send({ data: item }))
     .catch(next);
 };
 
 module.exports = {
   createItem,
-  getItems,
   getItemById,
   deleteItem,
   likeItem,
