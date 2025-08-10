@@ -7,7 +7,7 @@ const {
   ServerError,
 } = require("../utils/errors");
 
-const handleError = (err, req, res) => {
+const handleError = (err, req, res, next) => {
   console.error(err);
 
   // Handle all custom error instances

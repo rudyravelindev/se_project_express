@@ -13,7 +13,7 @@ router.post("/signup", validateUserBody, createUser);
 
 // Protected routes
 router.use("/users", auth, require("./users"));
-router.use("/items", require("./clothingItems"));
+router.use("/items", auth, require("./clothingItems"));
 
 // 404 handler
 router.use((req, res, next) => {

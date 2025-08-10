@@ -4,6 +4,7 @@ const { NotFoundError, ForbiddenError } = require("../utils/errors");
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
+  console.log("req.user in createItem:", req.user);
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
