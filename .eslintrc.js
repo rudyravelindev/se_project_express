@@ -22,5 +22,6 @@ module.exports = {
   rules: {
     "no-underscore-dangle": ["error", { allow: ["_id"] }],
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
   },
 };
