@@ -1,10 +1,12 @@
 const express = require("express");
 const { celebrate, Joi } = require("celebrate");
+const { authorize } = require("../middlewares/auth");
 
 const router = express.Router();
 
 const {
   createItem,
+  getItems,
   getItemById,
   deleteItem,
   likeItem,
@@ -25,10 +27,12 @@ const itemIdSchema = celebrate({
   }),
 });
 
-router.post("/", createItemSchema, createItem);
-router.get("/:id", itemIdSchema, getItemById);
-router.delete("/:id", itemIdSchema, deleteItem);
-router.put("/:id/likes", itemIdSchema, likeItem);
-router.delete("/:id/likes", itemIdSchema, dislikeItem);
+router.get("/", getItems);
+
+router.post("/", authorize, createItemSchema, createItem);
+router.get("/:id", authorize, itemIdSchema, getItemById);
+router.delete("/:id", authorize, itemIdSchema, deleteItem);
+router.put("/:id/likes", authorize, itemIdSchema, likeItem);
+router.delete("/:id/likes", authorize, itemIdSchema, dislikeItem);
 
 module.exports = router;
