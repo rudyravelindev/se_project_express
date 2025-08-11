@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const { UnauthorizedError } = require("../utils/errors");
 
-module.exports = (req, res, next) => {
+// Name the middleware function explicitly
+const authorize = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -15,9 +16,10 @@ module.exports = (req, res, next) => {
     const payload = jwt.verify(token, JWT_SECRET);
     req.user = payload;
     console.log("JWT payload:", payload);
-
     return next();
   } catch (err) {
     return next(new UnauthorizedError("Invalid or expired token"));
   }
 };
+
+module.exports = { authorize };

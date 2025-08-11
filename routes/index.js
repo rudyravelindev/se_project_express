@@ -1,19 +1,51 @@
+// const router = require("express").Router();
+// const { login, createUser } = require("../controllers/users");
+// const { authorize } = require("../middlewares/auth");
+// const {
+//   validateUserBody,
+//   validateLogin,
+// } = require("../middlewares/validation");
+// const { NotFoundError } = require("../utils/errors");
+
+// // Import routers separately
+// const usersRouter = require("./users");
+// const clothingItemsRouter = require("./clothingItems");
+
+// // Public routes
+// router.post("/signin", validateLogin, login);
+// router.post("/signup", validateUserBody, createUser);
+
+// // Protected routes
+// router.use("/users", authorize, usersRouter);
+// router.use("/items", authorize, clothingItemsRouter);
+
+// // 404 handler
+// router.use((req, res, next) => {
+//   next(new NotFoundError("Requested resource not found"));
+// });
+
+// module.exports = router;
+
 const router = require("express").Router();
 const { login, createUser } = require("../controllers/users");
-const auth = require("../middlewares/auth");
+const { authorize } = require("../middlewares/auth"); // Changed to named import
 const {
   validateUserBody,
   validateLogin,
 } = require("../middlewares/validation");
 const { NotFoundError } = require("../utils/errors");
 
+// Import routers separately
+const usersRouter = require("./users");
+const clothingItemsRouter = require("./clothingItems");
+
 // Public routes
 router.post("/signin", validateLogin, login);
 router.post("/signup", validateUserBody, createUser);
 
 // Protected routes
-router.use("/users", auth, require("./users"));
-router.use("/items", auth, require("./clothingItems"));
+router.use("/users", authorize, usersRouter); // Use authorize middleware
+router.use("/items", authorize, clothingItemsRouter);
 
 // 404 handler
 router.use((req, res, next) => {

@@ -5,11 +5,29 @@ const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   console.log("req.user in createItem:", req.user);
+  console.log("Request body:", req.body); // Add this line
+  console.log("Extracted data:", { name, weather, imageUrl, owner }); // Add this line
 
   ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(201).send(item))
-    .catch(next);
+    .then((item) => {
+      console.log("Item created successfully:", item); // Add this line
+      res.status(201).send(item);
+    })
+    .catch((error) => {
+      console.log("Error creating item:", error); // Add this line
+      next(error);
+    });
 };
+
+// const createItem = (req, res, next) => {
+//   const { name, weather, imageUrl } = req.body;
+//   const owner = req.user._id;
+//   console.log("req.user in createItem:", req.user);
+
+//   ClothingItem.create({ name, weather, imageUrl, owner })
+//     .then((item) => res.status(201).send(item))
+//     .catch(next);
+// };
 
 const getItemById = (req, res, next) => {
   const { id } = req.params;
@@ -21,6 +39,11 @@ const getItemById = (req, res, next) => {
       }
       res.send(item);
     })
+    .catch(next);
+};
+const getItems = (req, res, next) => {
+  ClothingItem.find({})
+    .then((items) => res.send(items))
     .catch(next);
 };
 
@@ -82,4 +105,5 @@ module.exports = {
   deleteItem,
   likeItem,
   dislikeItem,
+  getItems,
 };
