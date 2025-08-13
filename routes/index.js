@@ -17,7 +17,7 @@ router.post("/signup", validateUserBody, createUser);
 
 // Protected routes
 router.use("/users", authorize, usersRouter);
-router.use("/items", authorize, clothingItemsRouter);
+router.use("/items", clothingItemsRouter);
 
 // 404 handler
 router.use((req, res, next) => {

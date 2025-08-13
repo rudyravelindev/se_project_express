@@ -28,9 +28,8 @@ const itemIdSchema = celebrate({
 });
 
 router.get("/", getItems);
-
 router.post("/", authorize, createItemSchema, createItem);
-router.get("/:id", authorize, itemIdSchema, getItemById);
+router.get("/:id", itemIdSchema, getItemById);
 router.delete("/:id", authorize, itemIdSchema, deleteItem);
 router.put("/:id/likes", authorize, itemIdSchema, likeItem);
 router.delete("/:id/likes", authorize, itemIdSchema, dislikeItem);

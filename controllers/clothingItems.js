@@ -4,17 +4,20 @@ const { NotFoundError, ForbiddenError } = require("../utils/errors");
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
-  console.log("req.user in createItem:", req.user);
-  console.log("Request body:", req.body); // Add this line
-  console.log("Extracted data:", { name, weather, imageUrl, owner });
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      console.log("Item created successfully:", item);
-      res.status(201).send(item);
+      // Explicitly select fields to return
+      const itemResponse = item.toObject();
+      delete itemResponse.__v; // Remove version key
+      res.status(201).json(itemResponse);
     })
     .catch((error) => {
-      console.log("Error creating item:", error);
+      console.error("Detailed creation error:", {
+        error: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
       next(error);
     });
 };
@@ -31,10 +34,22 @@ const getItemById = (req, res, next) => {
     })
     .catch(next);
 };
+
 const getItems = (req, res, next) => {
   ClothingItem.find({})
-    .then((items) => res.send(items))
-    .catch(next);
+    .sort({ createdAt: -1 })
+    .lean() // Return plain JS objects
+    .then((items) => {
+      console.log(`Fetched ${items.length} items from DB`); // Debug log
+      res.json(items);
+    })
+    .catch((err) => {
+      console.error("Detailed fetch error:", {
+        error: err.message,
+        stack: err.stack,
+      });
+      next(err);
+    });
 };
 
 const deleteItem = (req, res, next) => {

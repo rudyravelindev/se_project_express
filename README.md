@@ -2,11 +2,11 @@
 
 ### Backend API
 
-**Base URL:** `https://api.rudyravelinwtwr.crabdance.com`
+**Base URL:** `https://api.wtwr.fpr.net`
 
 ### Frontend Application
 
-**URL:** [https://rudyravelinwtwr.crabdance.com](https://rudyravelinwtwr.crabdance.com)  
+**URL:** [https://wtwr.fpr.net](https://wtwr.fpr.net)  
 **Features:**
 
 ## Project Description
