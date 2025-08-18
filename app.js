@@ -16,7 +16,13 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://wtwr.fpr.net", // frontend domain
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // allowed methods
+    credentials: true, // if you use cookies or auth headers
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
