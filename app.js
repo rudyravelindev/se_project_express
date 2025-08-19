@@ -18,9 +18,9 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: "https://wtwr.fpr.net", // frontend domain
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // allowed methods
-    credentials: true, // if you use cookies or auth headers
+    origin: "https://wtwr.fpr.net",
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+    credentials: true,
   })
 );
 
