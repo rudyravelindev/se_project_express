@@ -7,7 +7,6 @@ const createItem = (req, res, next) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      // Explicitly select fields to return
       const itemResponse = item.toObject();
       delete itemResponse.v;
       res.status(201).json(itemResponse);
@@ -38,14 +37,14 @@ const getItemById = (req, res, next) => {
 const getItems = (req, res, next) => {
   ClothingItem.find({})
     .sort({ createdAt: -1 })
-    .lean() // Return plain JS objects
+    .lean()
     .then((items) => {
       // Convert owner ObjectId to string
       const itemsWithOwnerStr = items.map((item) => ({
         ...item,
         owner: item.owner.toString(),
       }));
-      console.log(`Fetched ${itemsWithOwnerStr.length} items from DB`); // Debug log
+      console.log(`Fetched ${itemsWithOwnerStr.length} items from DB`);
       res.json(itemsWithOwnerStr);
     })
     .catch((err) => {
@@ -56,23 +55,6 @@ const getItems = (req, res, next) => {
       next(err);
     });
 };
-
-// const getItems = (req, res, next) => {
-//   ClothingItem.find({})
-//     .sort({ createdAt: -1 })
-//     .lean() // Return plain JS objects
-//     .then((items) => {
-//       console.log(`Fetched ${items.length} items from DB`); // Debug log
-//       res.json(items);
-//     })
-//     .catch((err) => {
-//       console.error("Detailed fetch error:", {
-//         error: err.message,
-//         stack: err.stack,
-//       });
-//       next(err);
-//     });
-// };
 
 const deleteItem = (req, res, next) => {
   const { id } = req.params;
