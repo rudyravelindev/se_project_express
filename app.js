@@ -15,11 +15,11 @@ const { PORT = 3001, MONGO_URL = "mongodb://127.0.0.1:27017/wtwr_db" } =
 const app = express();
 
 // Security middleware
-app.use(helmet());
 app.use(
   cors({
-    origin: "https://wtwr.fpr.net",
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+    origin: ["http://localhost:3000", "https://wtwr.fpr.net"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
